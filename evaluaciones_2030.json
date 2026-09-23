@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "institucion": "I.E. 2026",
+    "area": "Educación para el Trabajo (EPT)",
+    "especialidad": "Gestión de Proyectos de Emprendimiento Económico o Social",
+    "docente": "Segundo Antonio Guanilo Cacho",
+    "ano_academico": 2030,
+    "periodos_disponibles": [
+      "Diagnóstica",
+      "I Bimestre"
+    ],
+    "periodos_totales": [
+      "Diagnóstica",
+      "I Bimestre",
+      "II Bimestre",
+      "III Bimestre",
+      "IV Bimestre"
+    ]
+  },
+  "grados": {
+    "1° Grado": {},
+    "2° Grado": {},
+    "3° Grado": {},
+    "4° Grado": {},
+    "5° Grado": {},
+    "Promedio General": {}
+  },
+  "secciones": {},
+  "secciones_bimestres": {}
+}

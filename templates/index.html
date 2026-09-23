@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema Agente Estadistico EPT 2026 - Analisis Comparativo</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <div class="logo-icon">
+        <i class="fa-solid fa-chart-line"></i>
+      </div>
+      <div>
+        <h1 id="app-nav-title">Agente Estadistico EPT 2026</h1>
+        <p class="subtitle">Analisis Comparativo Multianual por Grados y Bimestres | I.E. 2026</p>
+      </div>
+    </div>
+
+    <div class="nav-actions">
+      <div class="year-selector-badge">
+        <i class="fa-solid fa-calendar-days icon-amber"></i>
+        <span>Año Lectivo:</span>
+        <select id="academic-year-select" onchange="changeAcademicYear()" class="year-dropdown">
+          <option value="2026" selected>2026</option>
+          <option value="2027">2027</option>
+          <option value="2028">2028</option>
+          <option value="2029">2029</option>
+          <option value="2030">2030</option>
+          <option value="2031">2031</option>
+          <option value="2032">2032</option>
+          <option value="2033">2033</option>
+          <option value="2034">2034</option>
+          <option value="2035">2035</option>
+        </select>
+      </div>
+      <span class="badge badge-primary"><i class="fa-solid fa-user-tie"></i> Prof. Segundo Guanilo Cacho</span>
+      <button class="btn btn-outline" onclick="openSectionUploadModal()">
+        <i class="fa-solid fa-cloud-arrow-up"></i> Cargar Bimestre
+      </button>
+      <button class="btn btn-outline" onclick="previewPDF()">
+        <i class="fa-solid fa-eye"></i> Ver PDF
+      </button>
+      <button class="btn btn-emerald" onclick="downloadPDF()">
+        <i class="fa-solid fa-file-pdf"></i> Descargar PDF
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Executive KPI Row -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span>Estudiantes Evaluados</span>
+          <i class="fa-solid fa-users icon-blue"></i>
+        </div>
+        <div class="kpi-value" id="kpi-total">266</div>
+        <div class="kpi-sub">Total de 1ro a 5to Secundaria</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span>Logro Satisfactorio (AD/A)</span>
+          <i class="fa-solid fa-circle-check icon-green"></i>
+        </div>
+        <div class="kpi-value" id="kpi-ada">56.0%</div>
+        <div class="kpi-sub text-green" id="kpi-ada-var"><i class="fa-solid fa-arrow-trend-up"></i> +1.8% vs. Diagnostica</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span>En Proceso (B)</span>
+          <i class="fa-solid fa-clock icon-amber"></i>
+        </div>
+        <div class="kpi-value" id="kpi-b">42.1%</div>
+        <div class="kpi-sub text-amber" id="kpi-b-var"><i class="fa-solid fa-arrow-trend-up"></i> +11.3% vs. Diagnostica</div>
+      </div>
+
+      <div class="kpi-card highlight-danger">
+        <div class="kpi-header">
+          <span>En Inicio (C)</span>
+          <i class="fa-solid fa-triangle-exclamation icon-red"></i>
+        </div>
+        <div class="kpi-value" id="kpi-c">1.9%</div>
+        <div class="kpi-sub text-green" id="kpi-c-var"><i class="fa-solid fa-arrow-trend-down"></i> -13.1% Reduccion Significativa</div>
+      </div>
+    </section>
+
+    <!-- Controls & Filters Section -->
+    <section class="control-panel glass-card">
+      <div class="control-group">
+        <label><i class="fa-solid fa-sliders"></i> Seleccionar Bimestres a Comparar:</label>
+        <div class="period-checkboxes" id="period-selector"></div>
+      </div>
+
+      <div class="control-group">
+        <label><i class="fa-solid fa-filter"></i> Filtrar por Grado:</label>
+        <select id="grade-filter" onchange="filterData()">
+          <option value="ALL">Todos los Grados (1ro a 5to)</option>
+          <option value="1° Grado">1er Grado</option>
+          <option value="2° Grado">2do Grado</option>
+          <option value="3° Grado">3er Grado</option>
+          <option value="4° Grado">4to Grado</option>
+          <option value="5° Grado">5to Grado</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Main Chart and General Comparison Table Grid -->
+    <div class="main-grid">
+      <div class="card glass-card">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-chart-column icon-blue"></i> Comparativa de Logros por Grado</h2>
+          <div class="view-toggle">
+            <button class="btn-toggle active" id="btn-chart-js" onclick="toggleChartView('chartjs')">Interactivo</button>
+            <button class="btn-toggle" id="btn-chart-img" onclick="toggleChartView('img')">Imagen HD</button>
+          </div>
+        </div>
+        <div class="chart-container" id="chart-js-wrapper">
+          <canvas id="comparisonChart"></canvas>
+        </div>
+        <div class="chart-container hidden" id="chart-img-wrapper">
+          <img src="/comparativa_logros.png" alt="Grafico Comparativo" id="hd-chart-img">
+        </div>
+      </div>
+
+      <div class="card glass-card">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-table-list icon-teal"></i> Consolidado por Grados</h2>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table" id="table-grades">
+            <thead>
+              <tr id="table-grades-header-1"></tr>
+              <tr id="table-grades-header-2"></tr>
+            </thead>
+            <tbody id="table-grades-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Breakdown Table Card -->
+    <section class="card glass-card mt-6">
+      <div class="card-header">
+        <h2><i class="fa-solid fa-layer-group icon-amber"></i> Desglose Detallado por Secciones (1roA a 5toB)</h2>
+        <span class="badge badge-warning" id="alert-badge"><i class="fa-solid fa-bell"></i> 2do A Requiere Atencion Prioritaria</span>
+      </div>
+      <div class="table-responsive">
+        <table class="data-table" id="table-sections">
+          <thead>
+            <tr>
+              <th>SECCION</th>
+              <th>MATRICULADOS</th>
+              <th>EVALUADOS</th>
+              <th>SATISFACTORIO (AD/A)</th>
+              <th>EN PROCESO (B)</th>
+              <th>EN INICIO (C)</th>
+              <th>ESTADO</th>
+            </tr>
+          </thead>
+          <tbody id="table-sections-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- =====================================================
+       MODAL: Upload by Grade and Section
+       ===================================================== -->
+  <div class="modal-overlay hidden" id="upload-modal">
+    <div class="modal-content section-modal-content glass-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-cloud-arrow-up icon-blue"></i> Cargar Datos por Grado y Seccion</h3>
+        <button class="btn-close" onclick="closeSectionUploadModal()">&times;</button>
+      </div>
+      
+      <!-- Step 1: Select Bimester -->
+      <div class="form-group">
+        <label><i class="fa-solid fa-calendar-days"></i> Bimestre Destino:</label>
+        <select id="section_bimester_name" onchange="loadUploadStatus()">
+          <option value="I Bimestre">I Bimestre</option>
+          <option value="II Bimestre">II Bimestre</option>
+          <option value="III Bimestre">III Bimestre</option>
+          <option value="IV Bimestre">IV Bimestre</option>
+        </select>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="upload-progress-bar">
+        <div class="progress-track">
+          <div class="progress-fill" id="upload-progress-fill" style="width: 0%"></div>
+        </div>
+        <span class="progress-label" id="upload-progress-label">0 de 10 secciones cargadas</span>
+      </div>
+
+      <!-- Upload Grid: 5 grades x 2 sections -->
+      <div class="upload-grid">
+        <!-- 1er Grado -->
+        <div class="grade-row">
+          <div class="grade-label">1er Grado</div>
+          <div class="grade-slots">
+            <div class="drop-zone" data-grado="1" data-seccion="A" id="drop-1-A">
+              <input type="file" class="hidden-file" accept=".xlsx,.xls">
+              <i class="fa-solid fa-file-excel"></i>
+              <span>1ro A</span>
+              <small class="drop-hint">Clic o arrastre archivo</small>
+            </div>
+            <div class="drop-zone" data-grado="1" data-seccion="B" id="drop-1-B">
+              <input type="file" class="hidden-file" accept=".xlsx,.xls">
+              <i class="fa-solid fa-file-excel"></i>
+              <span>1ro B</span>
+              <small class="drop-hint">Clic o arrastre archivo</small>
+            </div>
+          </div>
+        </div>
+        <!-- 2do Grado -->
+        <div class="grade-row">
+          <div class="grade-label">2do Grado</div>
+          <div class="grade-slots">
+            <div class="drop-zone" data-grado="2" data-seccion="A" id="drop-2-A">
+              <input type="file" class="hidden-file" accept=".xlsx,.xls">
+              <i class="fa-solid fa-file-excel"></i>
+              <span>2do A</span>
+              <small class="drop-hint">Clic o arrastre archivo</small>
+            </div>
+            <div class="drop-zone" data-grado="2" data-seccion="B" id="drop-2-B">
+              <input type="file" class="hidden-file" accept=".xlsx,.xls">
+              <i class="fa-solid fa-file-excel"></i>
+              <span>2do B</span>
+              <small class="drop-hint">Clic o arrastre archivo</small>
+            </div>
+          </div>
+        </div>
+        <!-- 3er Grado -->
+        <div class="grade-row">
+          <div class="grade-label">3er Grado</div>
+          <div class="grade-slots">
+            <div class="drop-zone" data-grado="3" data-seccion="A" id="drop-3-A">
+              <input type="file" class="hidden-file" accept=".xlsx,.xls">
+              <i class="fa-solid fa-file-excel"></i>
+              <span>3ro A</span>
+              <small class="drop-hint">Clic o arrastre archivo</small>
+            </div>
+            <div class="drop-zone" data-grado="3" data-seccion="B" id="drop-3-B">
+              <input type="file" class="hidden-file" accept=".xlsx,.xls">
+              <i class="fa-solid fa-file-excel"></i>
+              <span>3ro B</span>
+              <small class="drop-hint">Clic o arrastre archivo</small>
+            </div>
+          </div>
+        </div>
+        <!-- 4to Grado -->
+        <div class="grade-row">
+          <div class="grade-label">4to Grado</div>
+          <div class="grade-slots">
+            <div class="drop-zone" data-grado="4" data-seccion="A" id="drop-4-A">
+              <input type="file" class="hidden-file" accept=".xlsx,.xls">
+              <i class="fa-solid fa-file-excel"></i>
+              <span>4to A</span>
+              <small class="drop-hint">Clic o arrastre archivo</small>
+            </div>
+            <div class="drop-zone" data-grado="4" data-seccion="B" id="drop-4-B">
+              <input type="file" class="hidden-file" accept=".xlsx,.xls">
+              <i class="fa-solid fa-file-excel"></i>
+              <span>4to B</span>
+              <small class="drop-hint">Clic o arrastre archivo</small>
+            </div>
+          </div>
+        </div>
+        <!-- 5to Grado -->
+        <div class="grade-row">
+          <div class="grade-label">5to Grado</div>
+          <div class="grade-slots">
+            <div class="drop-zone" data-grado="5" data-seccion="A" id="drop-5-A">
+              <input type="file" class="hidden-file" accept=".xlsx,.xls">
+              <i class="fa-solid fa-file-excel"></i>
+              <span>5to A</span>
+              <small class="drop-hint">Clic o arrastre archivo</small>
+            </div>
+            <div class="drop-zone" data-grado="5" data-seccion="B" id="drop-5-B">
+              <input type="file" class="hidden-file" accept=".xlsx,.xls">
+              <i class="fa-solid fa-file-excel"></i>
+              <span>5to B</span>
+              <small class="drop-hint">Clic o arrastre archivo</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action bar -->
+      <div class="counter-bar mt-6">
+        <div class="counter-text"><span id="upload-counter">0</span> archivos listos para procesar</div>
+        <div class="modal-footer" style="margin-top:0;">
+          <button type="button" class="btn btn-outline" onclick="closeSectionUploadModal()">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="btn-submit-sections" onclick="handleSectionsUpload()" disabled>
+            <i class="fa-solid fa-gears"></i> Consolidar e Importar
+          </button>
+        </div>
+      </div>
+
+      <!-- Results Panel (appears after upload) -->
+      <div id="upload-results-panel" class="hidden mt-6">
+        <h4 style="margin-bottom: 1rem;"><i class="fa-solid fa-square-poll-vertical icon-teal"></i> Resultados de Consolidacion</h4>
+        <div id="upload-alerts-container"></div>
+        <div class="table-responsive">
+          <table class="data-table" id="table-upload-results">
+            <thead>
+              <tr>
+                <th>SECCION</th>
+                <th>EVALUADOS</th>
+                <th>AD/A</th>
+                <th>B</th>
+                <th>C</th>
+                <th>ALERTA</th>
+              </tr>
+            </thead>
+            <tbody id="table-upload-results-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>&copy; 2026 Agente Estadistico Pedagogico - Sistema de Gestion de Logros de Aprendizaje (EPT)</p>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
