@@ -345,6 +345,13 @@ function toggleChartView(view) {
 // PDF DOWNLOAD
 // ============================================================
 async function downloadPDF() {
+  const btn = document.getElementById("btn-download-pdf");
+  const origHtml = btn ? btn.innerHTML : "";
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando PDF...';
+  }
+  
   try {
     const res = await fetch(`/api/generate-pdf?year=${selectedYear}`, {
       method: "POST",
@@ -362,18 +369,60 @@ async function downloadPDF() {
       a.download = `Reporte_Comparativo_Estadisticas_EPT_${selectedYear}.pdf`;
       document.body.appendChild(a);
       a.click();
-      setTimeout(() => { window.URL.revokeObjectURL(url); a.remove(); }, 1000);
+      setTimeout(() => { window.URL.revokeObjectURL(url); a.remove(); }, 1500);
     } else {
-      alert("Error al generar el reporte PDF.");
+      const errJson = await res.json().catch(() => ({}));
+      alert("Error al generar el reporte PDF: " + (errJson.error || res.statusText));
     }
   } catch (err) {
-    alert("Error al comunicarse con el servidor PDF.");
+    console.error("Error al descargar PDF:", err);
+    alert("Error de conexión al generar el reporte PDF.");
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = origHtml;
+    }
   }
 }
 
-function previewPDF() {
-  const pStr = encodeURIComponent(activePeriods.join(","));
-  window.open(`/api/generate-pdf?periods=${pStr}&view=preview&year=${selectedYear}`, '_blank');
+async function previewPDF() {
+  const btn = document.getElementById("btn-preview-pdf");
+  const origHtml = btn ? btn.innerHTML : "";
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Preparando vista...';
+  }
+  
+  try {
+    const pStr = encodeURIComponent(activePeriods.join(","));
+    const res = await fetch(`/api/generate-pdf?periods=${pStr}&view=preview&year=${selectedYear}`);
+    
+    if (res.ok) {
+      const blobData = await res.blob();
+      const pdfBlob = new Blob([blobData], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(pdfBlob);
+      const win = window.open(url, '_blank');
+      if (!win) {
+        // In case popup blocker caught window.open, trigger inline fallback
+        const a = document.createElement("a");
+        a.href = url;
+        a.target = "_blank";
+        a.click();
+      }
+      setTimeout(() => { window.URL.revokeObjectURL(url); }, 60000);
+    } else {
+      const errJson = await res.json().catch(() => ({}));
+      alert("Error al generar la vista previa del PDF: " + (errJson.error || res.statusText));
+    }
+  } catch (err) {
+    console.error("Error al previsualizar PDF:", err);
+    alert("Error de conexión al generar la vista previa del PDF.");
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = origHtml;
+    }
+  }
 }
 
 // ============================================================

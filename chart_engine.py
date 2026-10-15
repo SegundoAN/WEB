@@ -49,55 +49,68 @@ def generate_comparative_chart(json_path="evaluaciones_2026.json", output_image=
     total_bar_width = 0.75
     bar_width = total_bar_width / num_periods
 
-    for i, grade in enumerate(grades):
-        ax = axes[i]
-        grade_data = data["grados"].get(grade, {})
-        
-        for p_idx, period in enumerate(periods):
-            p_stats = grade_data.get(period, {"pct_AD_A": 0, "pct_B": 0, "pct_C": 0})
-            values = [p_stats.get("pct_AD_A", 0), p_stats.get("pct_B", 0), p_stats.get("pct_C", 0)]
-            
-            # Position offset
-            offset = (p_idx - (num_periods - 1) / 2.0) * bar_width
-            color = period_colors.get(period, "#475569")
-            
-            rects = ax.bar(x + offset, values, bar_width, label=period if i == 0 else "", color=color, edgecolor="black", linewidth=0.5)
-            
-            # Annotate values
-            for rect in rects:
-                height = rect.get_height()
-                if height > 0:
-                    ax.annotate(f'{height:.1f}%',
-                                xy=(rect.get_x() + rect.get_width() / 2, height),
-                                xytext=(0, 2),
-                                textcoords="offset points",
-                                ha='center', va='bottom', fontsize=7.5, fontweight='bold')
-
+    try:
         # Formatting
-        ax.set_title(grade, fontsize=12, fontweight='bold', pad=10, color="#1E293B")
-        ax.set_xticks(x)
-        ax.set_xticklabels(categories, fontsize=9, fontweight='semibold')
-        ax.set_ylim(0, 115)
-        ax.grid(axis='y', linestyle='--', alpha=0.5)
+        for i, grade in enumerate(grades):
+            ax = axes[i]
+            grade_data = data["grados"].get(grade, {})
+            if not grade_data:
+                grade_data = {}
+            
+            for p_idx, period in enumerate(periods):
+                p_stats = grade_data.get(period, {"pct_AD_A": 0, "pct_B": 0, "pct_C": 0})
+                if not p_stats:
+                    p_stats = {"pct_AD_A": 0, "pct_B": 0, "pct_C": 0}
+                values = [float(p_stats.get("pct_AD_A", 0) or 0), float(p_stats.get("pct_B", 0) or 0), float(p_stats.get("pct_C", 0) or 0)]
+                
+                # Position offset
+                offset = (p_idx - (num_periods - 1) / 2.0) * bar_width
+                color = period_colors.get(period, "#475569")
+                
+                rects = ax.bar(x + offset, values, bar_width, label=period if i == 0 else "", color=color, edgecolor="black", linewidth=0.5)
+                
+                # Annotate values
+                for rect in rects:
+                    height = rect.get_height()
+                    if height > 0:
+                        ax.annotate(f'{height:.1f}%',
+                                    xy=(rect.get_x() + rect.get_width() / 2, height),
+                                    xytext=(0, 2),
+                                    textcoords="offset points",
+                                    ha='center', va='bottom', fontsize=7.5, fontweight='bold')
 
-        if i % 3 == 0:
-            ax.set_ylabel('Porcentaje de Estudiantes (%)', fontsize=10, fontweight='semibold')
+            ax.set_title(grade, fontsize=12, fontweight='bold', pad=10, color="#1E293B")
+            ax.set_xticks(x)
+            ax.set_xticklabels(categories, fontsize=9, fontweight='semibold')
+            ax.set_ylim(0, 115)
+            ax.grid(axis='y', linestyle='--', alpha=0.5)
 
-    # Global Legend and Title
-    fig.legend(loc='upper right', bbox_to_anchor=(0.98, 0.96), frameon=True, facecolor='white', edgecolor='#CBD5E1', fontsize=10)
-    
-    ano_academico = data.get("meta", {}).get("ano_academico", 2026)
-    title_periods = " vs. ".join(periods)
-    plt.suptitle(f"Comparativa de Logros de Aprendizaje: {title_periods} (Año {ano_academico})\nÁrea: Educación para el Trabajo (EPT)",
-                 fontsize=15, fontweight='bold', y=0.98, color="#0F172A")
+            if i % 3 == 0:
+                ax.set_ylabel('Porcentaje de Estudiantes (%)', fontsize=10, fontweight='semibold')
 
-    plt.tight_layout()
-    plt.subplots_adjust(top=0.88, hspace=0.3, wspace=0.15)
-    
-    plt.savefig(output_image, dpi=300, bbox_inches='tight')
-    plt.close()
-    print(f"Chart generated successfully: {output_image}")
-    return True
+        # Global Legend and Title
+        fig.legend(loc='upper right', bbox_to_anchor=(0.98, 0.96), frameon=True, facecolor='white', edgecolor='#CBD5E1', fontsize=10)
+        
+        ano_academico = data.get("meta", {}).get("ano_academico", 2026)
+        title_periods = " vs. ".join(periods)
+        plt.suptitle(f"Comparativa de Logros de Aprendizaje: {title_periods} (Año {ano_academico})\nÁrea: Educación para el Trabajo (EPT)",
+                     fontsize=15, fontweight='bold', y=0.98, color="#0F172A")
+
+        plt.tight_layout()
+        plt.subplots_adjust(top=0.88, hspace=0.3, wspace=0.15)
+        
+        out_dir = os.path.dirname(os.path.abspath(output_image))
+        if out_dir:
+            os.makedirs(out_dir, exist_ok=True)
+            
+        plt.savefig(output_image, dpi=150, bbox_inches='tight')
+        print(f"Chart generated successfully: {output_image}")
+        return True
+    except Exception as e:
+        print(f"Error generating comparative chart: {e}")
+        return False
+    finally:
+        plt.close('all')
 
 if __name__ == "__main__":
     generate_comparative_chart()

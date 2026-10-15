@@ -403,5 +403,5 @@ def get_upload_status(json_path="evaluaciones_2026.json"):
 
 
 if __name__ == "__main__":
-    success, msg = import_bimester_excel("calcular.xlsx", "II Bimestre")
-    print(msg)
+    status = get_upload_status()
+    print("Estado actual de subida de bimestres:", status)

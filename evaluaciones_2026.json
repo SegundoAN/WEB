@@ -8,7 +8,8 @@
     "periodos_disponibles": [
       "Diagnóstica",
       "I Bimestre",
-      "II Bimestre"
+      "II Bimestre",
+      "III Bimestre"
     ],
     "periodos_totales": [
       "Diagnóstica",
@@ -47,6 +48,16 @@
         "pct_AD_A": 64.06,
         "pct_B": 35.94,
         "pct_C": 0.0
+      },
+      "III Bimestre": {
+        "evaluados": 60,
+        "matriculados": 70,
+        "AD_A": 42,
+        "B": 18,
+        "C": 0,
+        "pct_AD_A": 70.0,
+        "pct_B": 30.0,
+        "pct_C": 0.0
       }
     },
     "2° Grado": {
@@ -76,6 +87,16 @@
         "matriculados": 64,
         "pct_AD_A": 52.73,
         "pct_B": 47.27,
+        "pct_C": 0.0
+      },
+      "III Bimestre": {
+        "evaluados": 56,
+        "matriculados": 64,
+        "AD_A": 31,
+        "B": 25,
+        "C": 0,
+        "pct_AD_A": 55.4,
+        "pct_B": 44.6,
         "pct_C": 0.0
       }
     },
@@ -107,6 +128,16 @@
         "pct_AD_A": 65.91,
         "pct_B": 34.09,
         "pct_C": 0.0
+      },
+      "III Bimestre": {
+        "evaluados": 44,
+        "matriculados": 51,
+        "AD_A": 27,
+        "B": 17,
+        "C": 0,
+        "pct_AD_A": 61.4,
+        "pct_B": 38.6,
+        "pct_C": 0.0
       }
     },
     "4° Grado": {
@@ -136,6 +167,16 @@
         "matriculados": 59,
         "pct_AD_A": 53.19,
         "pct_B": 46.81,
+        "pct_C": 0.0
+      },
+      "III Bimestre": {
+        "evaluados": 45,
+        "matriculados": 55,
+        "AD_A": 24,
+        "B": 21,
+        "C": 0,
+        "pct_AD_A": 53.3,
+        "pct_B": 46.7,
         "pct_C": 0.0
       }
     },
@@ -167,6 +208,16 @@
         "pct_AD_A": 83.02,
         "pct_B": 16.98,
         "pct_C": 0.0
+      },
+      "III Bimestre": {
+        "evaluados": 52,
+        "matriculados": 60,
+        "AD_A": 45,
+        "B": 7,
+        "C": 0,
+        "pct_AD_A": 86.5,
+        "pct_B": 13.5,
+        "pct_C": 0.0
       }
     },
     "Promedio General": {
@@ -195,6 +246,16 @@
         "C": 0,
         "pct_AD_A": 63.88,
         "pct_B": 36.12,
+        "pct_C": 0.0
+      },
+      "III Bimestre": {
+        "evaluados": 257,
+        "matriculados": 300,
+        "AD_A": 169,
+        "B": 88,
+        "C": 0,
+        "pct_AD_A": 65.8,
+        "pct_B": 34.2,
         "pct_C": 0.0
       }
     }
@@ -410,6 +471,118 @@
         "C": 0,
         "pct_AD_A": 81.48,
         "pct_B": 18.52,
+        "pct_C": 0.0,
+        "grado": "5° Grado"
+      }
+    },
+    "III Bimestre": {
+      "1° A": {
+        "matriculados": 36,
+        "evaluados": 31,
+        "AD_A": 22,
+        "B": 9,
+        "C": 0,
+        "pct_AD_A": 71.0,
+        "pct_B": 29.0,
+        "pct_C": 0.0,
+        "grado": "1° Grado"
+      },
+      "1° B": {
+        "matriculados": 34,
+        "evaluados": 29,
+        "AD_A": 20,
+        "B": 9,
+        "C": 0,
+        "pct_AD_A": 69.0,
+        "pct_B": 31.0,
+        "pct_C": 0.0,
+        "grado": "1° Grado"
+      },
+      "2° A": {
+        "matriculados": 32,
+        "evaluados": 28,
+        "AD_A": 15,
+        "B": 13,
+        "C": 0,
+        "pct_AD_A": 53.6,
+        "pct_B": 46.4,
+        "pct_C": 0.0,
+        "grado": "2° Grado"
+      },
+      "2° B": {
+        "matriculados": 32,
+        "evaluados": 28,
+        "AD_A": 16,
+        "B": 12,
+        "C": 0,
+        "pct_AD_A": 57.1,
+        "pct_B": 42.9,
+        "pct_C": 0.0,
+        "grado": "2° Grado"
+      },
+      "3° A": {
+        "matriculados": 25,
+        "evaluados": 22,
+        "AD_A": 14,
+        "B": 8,
+        "C": 0,
+        "pct_AD_A": 63.6,
+        "pct_B": 36.4,
+        "pct_C": 0.0,
+        "grado": "3° Grado"
+      },
+      "3° B": {
+        "matriculados": 26,
+        "evaluados": 22,
+        "AD_A": 13,
+        "B": 9,
+        "C": 0,
+        "pct_AD_A": 59.1,
+        "pct_B": 40.9,
+        "pct_C": 0.0,
+        "grado": "3° Grado"
+      },
+      "4° A": {
+        "matriculados": 28,
+        "evaluados": 22,
+        "AD_A": 11,
+        "B": 11,
+        "C": 0,
+        "pct_AD_A": 50.0,
+        "pct_B": 50.0,
+        "pct_C": 0.0,
+        "grado": "4° Grado"
+      },
+      "4° B": {
+        "matriculados": 27,
+        "evaluados": 23,
+        "AD_A": 13,
+        "B": 10,
+        "C": 0,
+        "pct_AD_A": 56.5,
+        "pct_B": 43.5,
+        "pct_C": 0.0,
+        "grado": "4° Grado"
+      },
+      "5° A": {
+        "matriculados": 29,
+        "evaluados": 26,
+        "AD_A": 23,
+        "B": 3,
+        "C": 0,
+        "pct_AD_A": 88.5,
+        "pct_B": 11.5,
+        "pct_C": 0.0,
+        "grado": "5° Grado"
+      },
+      "5° B": {
+        "matriculados": 31,
+        "evaluados": 26,
+        "AD_A": 22,
+        "B": 4,
+        "C": 0,
+        "pct_AD_A": 84.6,
+        "pct_B": 15.4,
         "pct_C": 0.0,
         "grado": "5° Grado"
       }

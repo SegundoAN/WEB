@@ -27,9 +27,10 @@ def resolve_year_context(req):
     except (ValueError, TypeError):
         year_int = 2026
 
-    json_filename = f"evaluaciones_{year_int}.json"
-    pdf_filename = f"Reporte_Comparativo_Estadisticas_EPT_{year_int}.pdf"
-    chart_filename = f"comparativa_logros_{year_int}.png"
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    json_filename = os.path.join(base_dir, f"evaluaciones_{year_int}.json")
+    pdf_filename = os.path.join(base_dir, f"Reporte_Comparativo_Estadisticas_EPT_{year_int}.pdf")
+    chart_filename = os.path.join(base_dir, f"comparativa_logros_{year_int}.png")
 
     if not os.path.exists(json_filename):
         init_json_for_year(json_filename, year_int)
@@ -83,25 +84,36 @@ def api_upload_status():
 
 @app.route("/api/generate-pdf", methods=["GET", "POST"])
 def api_generate_pdf():
-    json_path, pdf_path, chart_path, year = resolve_year_context(request)
-    
-    if request.method == "POST":
-        req = request.get_json(silent=True) or {}
-        periods = req.get("periods", None)
-    else:
-        periods_str = request.args.get("periods", "")
-        periods = [p.strip() for p in periods_str.split(",") if p.strip()] if periods_str else None
-    
-    success = generate_pdf_report(json_path=json_path, output_pdf=pdf_path, periods=periods)
-    if success and os.path.exists(pdf_path):
-        as_attach = request.args.get("view", "download") != "preview"
-        return send_file(
-            pdf_path,
-            mimetype="application/pdf",
-            as_attachment=as_attach,
-            download_name=f"Reporte_Comparativo_Estadisticas_EPT_{year}.pdf"
-        )
-    return jsonify({"success": False, "error": "Error al generar el PDF"}), 500
+    try:
+        json_path, pdf_path, chart_path, year = resolve_year_context(request)
+        
+        if request.method == "POST":
+            req = request.get_json(silent=True) or {}
+            periods = req.get("periods", None)
+        else:
+            periods_str = request.args.get("periods", "")
+            periods = [p.strip() for p in periods_str.split(",") if p.strip()] if periods_str else None
+        
+        success = generate_pdf_report(json_path=json_path, output_pdf=pdf_path, periods=periods)
+        
+        if success and os.path.exists(pdf_path):
+            as_attach = request.args.get("view", "download") != "preview"
+            response = send_file(
+                pdf_path,
+                mimetype="application/pdf",
+                as_attachment=as_attach,
+                download_name=f"Reporte_Comparativo_Estadisticas_EPT_{year}.pdf"
+            )
+            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+            return response
+        else:
+            return jsonify({"success": False, "error": "No se pudo generar el archivo PDF"}), 500
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"success": False, "error": f"Error interno al generar el PDF: {str(e)}"}), 500
 
 @app.route("/api/upload-sections", methods=["POST"])
 def api_upload_sections():
@@ -151,8 +163,11 @@ def api_upload_sections():
     ok, msg, details = consolidate_bimester(sections_data, bimester_name, json_path=json_path)
     
     if ok:
-        generate_comparative_chart(json_path=json_path, output_image=chart_path)
-        generate_pdf_report(json_path=json_path, output_pdf=pdf_path)
+        try:
+            generate_comparative_chart(json_path=json_path, output_image=chart_path)
+            generate_pdf_report(json_path=json_path, output_pdf=pdf_path)
+        except Exception as e:
+            print(f"Warning during post-upload chart/pdf generation: {e}")
         
         with open(json_path, "r", encoding="utf-8") as f:
             updated_data = json.load(f)
@@ -176,7 +191,9 @@ def get_chart_image():
     if not os.path.exists(chart_path):
         generate_comparative_chart(json_path=json_path, output_image=chart_path)
     if os.path.exists(chart_path):
-        return send_file(chart_path, mimetype="image/png")
+        response = send_file(chart_path, mimetype="image/png")
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        return response
     return jsonify({"error": "Image not generated yet"}), 404
 
 if __name__ == "__main__":
