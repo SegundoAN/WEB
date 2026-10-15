@@ -44,18 +44,18 @@ def draw_data_cell(pdf, text, width, height=6.5, bg_color=(255, 255, 255), text_
     pdf.cell(width, height, text, border=1, align=align, fill=True)
 
 def short_period_name(p):
-    p_lower = p.lower()
+    p_lower = p.lower().strip()
     if "diag" in p_lower:
         return "DIAG"
-    if "i " in p_lower or p_lower.startswith("i "):
-        return "I BIM"
-    if "ii " in p_lower or p_lower.startswith("ii "):
-        return "II BIM"
-    if "iii " in p_lower or p_lower.startswith("iii "):
-        return "III BIM"
-    if "iv " in p_lower or p_lower.startswith("iv "):
-        return "IV BIM"
-    return p[:7].upper()
+    if p_lower.startswith("iv") or "iv bim" in p_lower or "4" in p_lower:
+        return "IVB"
+    if p_lower.startswith("iii") or "iii bim" in p_lower or "3" in p_lower:
+        return "IIIB"
+    if p_lower.startswith("ii") or "ii bim" in p_lower or "2" in p_lower:
+        return "IIB"
+    if p_lower.startswith("i") or "i bim" in p_lower or "1" in p_lower:
+        return "IB"
+    return p[:6].upper()
 
 def generate_pdf_report(json_path="evaluaciones_2026.json", output_pdf="Reporte_Comparativo_Estadisticas_EPT_2026.pdf", periods=None):
     try:
